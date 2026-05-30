@@ -1,0 +1,38 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Dependências (arquivos pesados do npm)
+node_modules/
+
+# Variáveis de ambiente (suas chaves do Supabase/Firebase)
+.env
+.env.local
+
+# Arquivos de log de erros do npm
+npm-debug.log*
+
+# Pastas de build (geradas pelo Vite quando compila o site)
+dist/
+dist-ssr/
