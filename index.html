@@ -90,6 +90,37 @@
         </div>
     </div>
 
+    <!-- Add Cartão Modal -->
+    <div id="cartao-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Novo Cartão</h3>
+            <p class="text-sm text-gray-500 mb-4">Cadastre um cartão e suas datas.</p>
+            
+            <label class="block text-sm text-gray-500 mb-1">Nome do Cartão (Ex: Nubank)</label>
+            <input type="text" id="new-cartao-nome" class="w-full px-4 py-2 mb-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">Dia que Fecha</label>
+                    <input type="number" id="new-cartao-fechamento" min="1" max="31" placeholder="Ex: 25" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">Dia que Vence</label>
+                    <input type="number" id="new-cartao-vencimento" min="1" max="31" placeholder="Ex: 5" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('cartao-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+                <button id="btn-save-cartao" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- TELA DE AUTENTICAÇÃO -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
@@ -150,9 +181,17 @@
             
             <!-- ABA 1: RESUMO DO MÊS -->
             <section id="tab-resumo" class="tab-content active">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold">Resumo Geral</h2>
                     <input type="month" id="resumo-mes" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-500 mb-1">Filtrar por Cartão:</label>
+                    <select id="filtro-cartao" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="todos">Todos os Cartões</option>
+                        <!-- Renderizado via JS dinamicamente -->
+                    </select>
                 </div>
 
                 <!-- Resumo Dinâmico por Pessoas -->
@@ -174,7 +213,7 @@
                 </div>
             </section>
 
-            <!-- ABA 2: NOVA COMPRA CARTÃO -->
+            <!-- ABA 2: NOVA COMPRA CARTÃO E LISTA DE CARTÕES -->
             <section id="tab-compra" class="tab-content">
                 <h2 class="text-xl font-bold mb-6">Registrar no Cartão</h2>
                 <form id="form-compra" class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
@@ -189,25 +228,35 @@
                             <input type="number" step="0.01" id="c-valor" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-500 mb-1">Data</label>
+                            <label class="block text-sm text-gray-500 mb-1">Data da Compra</label>
                             <input type="date" id="c-data" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Categoria</label>
+                        <select id="c-categoria" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                            <option>Alimentação</option>
+                            <option>Casa / Mercado</option>
+                            <option>Lazer</option>
+                            <option>Roupas</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm text-gray-500 mb-1">Categoria</label>
-                            <select id="c-categoria" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-                                <option>Alimentação</option>
-                                <option>Casa / Mercado</option>
-                                <option>Lazer</option>
-                                <option>Roupas</option>
-                                <option>Outros</option>
-                            </select>
-                        </div>
                         <div>
                             <label class="block text-sm text-gray-500 mb-1">Parcelas</label>
                             <input type="number" id="c-parcelas" min="1" value="1" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm text-gray-500">Cartão</label>
+                                <button type="button" onclick="openCartaoModal()" class="text-xs text-brand-500 font-bold hover:underline">+ Novo</button>
+                            </div>
+                            <select id="c-cartao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                                <!-- Preenchido via JS -->
+                            </select>
                         </div>
                     </div>
 
@@ -233,6 +282,13 @@
                         Salvar Compra
                     </button>
                 </form>
+
+                <!-- LISTA DE CARTÕES -->
+                <h3 class="font-bold mb-3 mt-8 flex items-center gap-2"><i class="ph ph-cards"></i> Meus Cartões</h3>
+                <div id="lista-meus-cartoes" class="space-y-3 mb-8">
+                    <!-- Cartões renderizados via JS -->
+                </div>
+
             </section>
 
             <!-- ABA 3: EMPRÉSTIMOS -->
@@ -269,7 +325,7 @@
 
                 <form id="form-conta" class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 mb-8">
                     <div>
-                        <label class="block text-sm text-gray-500 mb-1">Descrição (Ex: Seguro Moto, Cartão da Vó)</label>
+                        <label class="block text-sm text-gray-500 mb-1">Descrição (Ex: Seguro Moto, Carnê)</label>
                         <input type="text" id="cf-descricao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     
@@ -350,6 +406,7 @@
         let pessoasData = [];
         let contasData = [];
         let pagamentosData = [];
+        let cartoesData = [];
 
         // UI Setup
         const hoje = new Date();
@@ -364,7 +421,6 @@
         // 1. AUTENTICAÇÃO
         // ==========================================
         
-        // Listener de mudança de estado de autenticação do Supabase
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 currentUser = session.user;
@@ -431,7 +487,7 @@
         });
 
         // ==========================================
-        // 2. BUSCA DE DADOS (SUPABASE SELECT)
+        // 2. BUSCA DE DADOS
         // ==========================================
         async function carregarDados() {
             if (!currentUser) return;
@@ -445,37 +501,35 @@
                 return data;
             };
 
-            // Busca todas as tabelas em paralelo para carregar mais rápido
-            [pessoasData, comprasData, emprestimosData, contasData, pagamentosData] = await Promise.all([
+            [pessoasData, comprasData, emprestimosData, contasData, pagamentosData, cartoesData] = await Promise.all([
                 fetchTable('pessoas'),
                 fetchTable('compras'),
                 fetchTable('emprestimos'),
                 fetchTable('contas'),
-                fetchTable('pagamentos')
+                fetchTable('pagamentos'),
+                fetchTable('cartoes')
             ]);
 
-            // Se for o primeiro acesso, cria "Eu" e "Mainha" por padrão
+            // Criações Padrões caso seja o primeiro acesso
             if (pessoasData.length === 0) {
                 const { error } = await supabase.from('pessoas').insert([
                     { nome: 'Eu', user_id: currentUser.id },
                     { nome: 'Mainha', user_id: currentUser.id }
                 ]);
-                if (!error) {
-                    pessoasData = await fetchTable('pessoas');
-                }
+                if (!error) pessoasData = await fetchTable('pessoas');
             }
 
             renderizarSelectPessoas();
+            renderizarSelectCartoes();
             atualizarResumo();
             renderizarContas();
             renderizarEmprestimos();
         }
 
         // ==========================================
-        // 3. INSERÇÕES (SUPABASE INSERT)
+        // 3. INSERÇÕES
         // ==========================================
 
-        // ADICIONAR PESSOA
         window.openPersonModal = () => document.getElementById('person-modal').classList.remove('hidden');
         
         document.getElementById('btn-save-person').addEventListener('click', async () => {
@@ -491,14 +545,45 @@
                 document.getElementById('new-person-name').value = '';
                 document.getElementById('person-modal').classList.add('hidden');
                 showToast("Pessoa adicionada!");
-                await carregarDados(); // Recarrega os dados do banco
+                await carregarDados();
             } else {
                 uiAlert("Erro ao salvar pessoa.");
             }
             btn.innerText = "Salvar";
         });
 
-        // SALVAR COMPRA
+        // ADICIONAR CARTÃO
+        window.openCartaoModal = () => document.getElementById('cartao-modal').classList.remove('hidden');
+        
+        document.getElementById('btn-save-cartao').addEventListener('click', async () => {
+            const nome = document.getElementById('new-cartao-nome').value.trim();
+            const diaFechamento = parseInt(document.getElementById('new-cartao-fechamento').value);
+            const diaVencimento = parseInt(document.getElementById('new-cartao-vencimento').value);
+
+            if(!nome || !diaFechamento || !diaVencimento) return uiAlert("Preencha todos os campos do cartão!");
+            if(diaFechamento < 1 || diaFechamento > 31 || diaVencimento < 1 || diaVencimento > 31) return uiAlert("Dias devem ser entre 1 e 31.");
+            
+            const btn = document.getElementById('btn-save-cartao');
+            btn.innerText = "Salvando...";
+
+            const { error } = await supabase.from('cartoes').insert([{ 
+                nome, dia_fechamento: diaFechamento, dia_vencimento: diaVencimento, user_id: currentUser.id 
+            }]);
+            
+            if (!error) {
+                document.getElementById('new-cartao-nome').value = '';
+                document.getElementById('new-cartao-fechamento').value = '';
+                document.getElementById('new-cartao-vencimento').value = '';
+                document.getElementById('cartao-modal').classList.add('hidden');
+                showToast("Cartão adicionado!");
+                await carregarDados();
+            } else {
+                uiAlert("Erro ao salvar cartão.");
+            }
+            btn.innerText = "Salvar";
+        });
+
+        // SALVAR COMPRA (COM LÓGICA DO CARTÃO ESCOLHIDO)
         document.getElementById('form-compra').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -507,22 +592,48 @@
             if(pagadoresCheckboxes.length === 0) {
                 return uiAlert("Selecione pelo menos uma pessoa que vai pagar a fatura!");
             }
+
+            const cartaoId = document.getElementById('c-cartao').value;
+            const cartaoSelecionado = cartoesData.find(c => c.id === cartaoId);
+            
+            if(!cartaoSelecionado) {
+                return uiAlert("Cadastre e selecione um cartão primeiro!");
+            }
             
             btn.innerText = "Salvando...";
             const pagadoresList = Array.from(pagadoresCheckboxes).map(cb => cb.value);
-            const dataCompra = new Date(document.getElementById('c-data').value + "T12:00:00");
+            
+            // Lógica Inteligente de Fechamento Baseado no Cartão Escolhido
+            const dataCompraStr = document.getElementById('c-data').value;
+            const dataCompra = new Date(dataCompraStr + "T12:00:00");
+            
+            const diaCompra = dataCompra.getDate();
+            let mesInicio = dataCompra.getMonth() + 1;
+            let anoInicio = dataCompra.getFullYear();
+            
+            const diaFechamento = cartaoSelecionado.dia_fechamento;
+
+            // Se comprou no dia do fechamento ou depois, a fatura pula para o mês seguinte
+            if (diaCompra >= diaFechamento) {
+                mesInicio++;
+                if (mesInicio > 12) {
+                    mesInicio = 1;
+                    anoInicio++;
+                }
+            }
 
             const novaCompra = {
                 user_id: currentUser.id,
+                cartao_id: cartaoSelecionado.id, // Vínculo com o cartão
                 descricao: document.getElementById('c-descricao').value,
                 valor_total: parseFloat(document.getElementById('c-valor').value),
-                data_compra: document.getElementById('c-data').value,
-                mes_inicio: dataCompra.getMonth() + 1,
-                ano_inicio: dataCompra.getFullYear(),
+                data_compra: dataCompraStr,
+                mes_inicio: mesInicio,
+                ano_inicio: anoInicio,
                 categoria: document.getElementById('c-categoria').value,
                 parcelas: parseInt(document.getElementById('c-parcelas').value),
                 comprador: document.getElementById('c-comprador').value,
-                pagadores: pagadoresList // Supabase lida com Arrays em colunas do tipo JSONB ou Text[]
+                pagadores: pagadoresList
             };
 
             const { error } = await supabase.from('compras').insert([novaCompra]);
@@ -539,7 +650,6 @@
             btn.innerText = "Salvar Compra";
         });
 
-        // SALVAR CONTA / DÍVIDA
         document.getElementById('form-conta').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -570,7 +680,6 @@
             btn.innerText = "Cadastrar Conta";
         });
 
-        // SALVAR EMPRÉSTIMO
         document.getElementById('form-emprestimo').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -629,27 +738,33 @@
 
         window.deletarItem = (tabela, id) => {
             uiConfirm("Deseja mesmo apagar este registro?", async () => {
-                await supabase.from(tabela).delete().eq('id', id);
-                showToast("Registro apagado.");
-                await carregarDados();
+                const { error } = await supabase.from(tabela).delete().eq('id', id);
+                if (error) {
+                    uiAlert("Não foi possível apagar. O registro pode estar atrelado a compras existentes.");
+                } else {
+                    showToast("Registro apagado.");
+                    await carregarDados();
+                }
             });
         }
 
         window.deletarPessoa = (id, nome) => {
             if(pessoasData.length <= 1) return uiAlert("Você não pode apagar todas as pessoas!");
             uiConfirm(`Apagar ${nome} das opções? (As contas antigas não serão apagadas)`, async () => {
-                await supabase.from('pessoas').delete().eq('id', id);
-                showToast("Pessoa removida.");
-                await carregarDados();
+                const { error } = await supabase.from('pessoas').delete().eq('id', id);
+                if (error) {
+                    uiAlert("Erro ao apagar. Esta pessoa pode estar vinculada a outras funções.");
+                } else {
+                    showToast("Pessoa removida.");
+                    await carregarDados();
+                }
             });
         }
-
 
         // ==========================================
         // 5. RENDERIZAÇÃO E LÓGICA DE UI
         // ==========================================
 
-        // UI HELPERS (Modals & Toasts)
         window.uiAlert = (msg) => {
             document.getElementById('alert-msg').innerText = msg;
             document.getElementById('alert-modal').classList.remove('hidden');
@@ -665,6 +780,44 @@
                 callback(); 
             };
             document.getElementById('confirm-no').onclick = () => modal.classList.add('hidden');
+        }
+
+        function renderizarSelectCartoes() {
+            const selectCartao = document.getElementById('c-cartao');
+            const filtroCartao = document.getElementById('filtro-cartao');
+            const listaMeusCartoes = document.getElementById('lista-meus-cartoes');
+            
+            selectCartao.innerHTML = '';
+            filtroCartao.innerHTML = '<option value="todos">Todos os Cartões</option>';
+            listaMeusCartoes.innerHTML = '';
+            
+            if (cartoesData.length === 0) {
+                listaMeusCartoes.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhum cartão cadastrado. Clique em "+ Novo" para adicionar.</p>`;
+            }
+
+            cartoesData.forEach(c => {
+                selectCartao.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                filtroCartao.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                
+                listaMeusCartoes.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                <i class="ph ph-credit-card text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-sm">${c.nome}</p>
+                                <p class="text-xs text-gray-500">
+                                    Fecha dia ${c.dia_fechamento} • Vence dia ${c.dia_vencimento}
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="deletarItem('cartoes', '${c.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity" title="Apagar Cartão">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
         }
 
         function renderizarSelectPessoas() {
@@ -692,12 +845,17 @@
             renderizarContas();
         });
 
+        document.getElementById('filtro-cartao').addEventListener('change', () => {
+            atualizarResumo();
+        });
+
         function atualizarResumo() {
             if(pessoasData.length === 0) return;
             const inputMes = document.getElementById('resumo-mes').value;
             if(!inputMes) return;
             
             const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
+            const cartaoFiltrado = document.getElementById('filtro-cartao').value;
             
             let totaisPorPessoa = {};
             pessoasData.forEach(p => totaisPorPessoa[p.nome] = 0);
@@ -706,6 +864,9 @@
             let comprasDoMes = [];
 
             comprasData.forEach(compra => {
+                // Aplica o filtro de cartão antes de calcular
+                if (cartaoFiltrado !== 'todos' && compra.cartao_id !== cartaoFiltrado) return;
+
                 const mesesDiferenca = (anoSelecionado - compra.ano_inicio) * 12 + (mesSelecionado - compra.mes_inicio);
                 
                 if (mesesDiferenca >= 0 && mesesDiferenca < compra.parcelas) {
@@ -727,11 +888,16 @@
                     }
 
                     totalGeral += valorParcela;
+                    
+                    // Identifica o nome do cartão usado
+                    const cartaoVinculado = cartoesData.find(c => c.id === compra.cartao_id);
+                    const nomeCartao = cartaoVinculado ? cartaoVinculado.nome : 'Cartão Excluído';
 
                     comprasDoMes.push({
                         ...compra,
                         valorParcela,
                         numeroParcelaAtual,
+                        nomeCartao,
                         textoDivisao: numPagadores === 1 ? `100% ${textoDivisaoArr[0] || 'Alguém'}` : `Div. entre ${numPagadores}`
                     });
                 }
@@ -775,7 +941,7 @@
                                 <div>
                                     <p class="font-medium text-sm">${c.descricao}</p>
                                     <p class="text-xs text-gray-500">
-                                        <span class="font-semibold">${c.comprador}</span> comprou • ${c.parcelas > 1 ? `Parc. ${c.numeroParcelaAtual}/${c.parcelas}` : 'À vista'}
+                                        <span class="font-semibold">${c.nomeCartao}</span> • ${c.parcelas > 1 ? `Parc. ${c.numeroParcelaAtual}/${c.parcelas}` : 'À vista'}
                                     </p>
                                 </div>
                             </div>
