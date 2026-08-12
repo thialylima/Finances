@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Chart.js para o Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
         tailwind.config = {
@@ -43,9 +45,9 @@
         </div>
     </div>
 
-    <!-- Custom Alert Modal -->
+    <!-- Modal de Alerta -->
     <div id="alert-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm transform transition-transform scale-100">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
             <div class="flex items-center gap-3 text-orange-500 mb-4">
                 <i class="ph ph-warning-circle text-3xl"></i>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Atenção</h3>
@@ -57,7 +59,7 @@
         </div>
     </div>
 
-    <!-- Custom Confirm Modal -->
+    <!-- Modal de Confirmação -->
     <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Confirmação</h3>
@@ -73,50 +75,73 @@
         </div>
     </div>
 
-    <!-- Add Person Modal -->
-    <div id="person-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+    <!-- Modal Adiantamento -->
+    <div id="adiantamento-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Nova Pessoa</h3>
-            <p class="text-sm text-gray-500 mb-4">Adicione alguém para dividir faturas (ex: Vinícius).</p>
-            <input type="text" id="new-person-name" placeholder="Nome da pessoa" class="w-full px-4 py-2 mb-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Adiantar Fatura</h3>
+            <p class="text-sm text-gray-500 mb-4">Abater um valor do total desta fatura.</p>
+            <input type="number" step="0.01" id="valor-adiantamento" placeholder="Valor (R$)" class="w-full px-4 py-2 mb-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
             <div class="flex gap-3">
-                <button onclick="document.getElementById('person-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">
+                <button onclick="document.getElementById('adiantamento-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">
                     Cancelar
                 </button>
-                <button id="btn-save-person" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
+                <button id="btn-save-adiantamento" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
                     Salvar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Add Cartão Modal -->
+    <!-- Modal Nova Categoria -->
+    <div id="categoria-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Nova Categoria</h3>
+            <input type="text" id="new-categoria-name" placeholder="Ex: Farmácia" class="w-full px-4 py-2 mb-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('categoria-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">
+                    Cancelar
+                </button>
+                <button id="btn-save-categoria" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
+                    Salvar
+                </button>
+            </div>
+            
+            <div class="mt-4 max-h-32 overflow-y-auto no-scrollbar">
+                <h4 class="text-xs font-bold text-gray-500 mb-2">CATEGORIAS EXISTENTES</h4>
+                <div id="lista-categorias-modal" class="space-y-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais Anteriores (Pessoa, Cartão, Auth) mantidos... -->
+    <div id="person-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Nova Pessoa</h3>
+            <input type="text" id="new-person-name" placeholder="Nome da pessoa" class="w-full px-4 py-2 mb-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('person-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">Cancelar</button>
+                <button id="btn-save-person" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="cartao-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-sm">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Novo Cartão</h3>
-            <p class="text-sm text-gray-500 mb-4">Cadastre um cartão e suas datas.</p>
-            
-            <label class="block text-sm text-gray-500 mb-1">Nome do Cartão (Ex: Nubank)</label>
-            <input type="text" id="new-cartao-nome" class="w-full px-4 py-2 mb-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-            
+            <input type="text" id="new-cartao-nome" placeholder="Nome do Cartão (Ex: Nubank)" class="w-full px-4 py-2 mb-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                    <label class="block text-sm text-gray-500 mb-1">Dia que Fecha</label>
-                    <input type="number" id="new-cartao-fechamento" min="1" max="31" placeholder="Ex: 25" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                    <label class="block text-xs text-gray-500 mb-1">Dia Fechamento</label>
+                    <input type="number" id="new-cartao-fechamento" min="1" max="31" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-500 mb-1">Dia que Vence</label>
-                    <input type="number" id="new-cartao-vencimento" min="1" max="31" placeholder="Ex: 5" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                    <label class="block text-xs text-gray-500 mb-1">Dia Vencimento</label>
+                    <input type="number" id="new-cartao-vencimento" min="1" max="31" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
             </div>
-
             <div class="flex gap-3">
-                <button onclick="document.getElementById('cartao-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">
-                    Cancelar
-                </button>
-                <button id="btn-save-cartao" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
-                    Salvar
-                </button>
+                <button onclick="document.getElementById('cartao-modal').classList.add('hidden')" class="flex-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors">Cancelar</button>
+                <button id="btn-save-cartao" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">Salvar</button>
             </div>
         </div>
     </div>
@@ -129,35 +154,19 @@
                     <i class="ph ph-wallet text-3xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold">Controle Financeiro</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-2">Faça login para acessar seus dados</p>
             </div>
-
             <form id="auth-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">E-mail</label>
-                    <input type="email" id="email" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Senha</label>
-                    <input type="password" id="password" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none">
-                </div>
-                
+                <input type="email" id="email" placeholder="E-mail" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none">
+                <input type="password" id="password" placeholder="Senha" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-2 focus:ring-brand-500 outline-none">
                 <div id="auth-error" class="text-red-500 text-sm hidden"></div>
-
-                <button type="submit" id="btn-login" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">
-                    Entrar
-                </button>
-                <button type="button" id="btn-register" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors mt-2">
-                    Criar nova conta
-                </button>
+                <button type="submit" id="btn-login" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-2 rounded-lg transition-colors">Entrar</button>
+                <button type="button" id="btn-register" class="w-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium py-2 rounded-lg transition-colors mt-2">Criar nova conta</button>
             </form>
         </div>
     </div>
 
     <!-- TELA PRINCIPAL (APP) -->
     <div id="app-screen" class="hidden min-h-screen pb-24">
-        
-        <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
             <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2 text-brand-500">
@@ -176,44 +185,61 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="max-w-md mx-auto p-4 mt-4">
             
             <!-- ABA 1: RESUMO DO MÊS -->
             <section id="tab-resumo" class="tab-content active">
+                
+                <!-- Área da Renda -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-4 rounded-2xl shadow-sm mb-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-sm font-medium opacity-90">Sua Renda Fixa</p>
+                            <button onclick="configurarRenda()" class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded transition-colors">Editar</button>
+                        </div>
+                        <p class="text-2xl font-bold" id="txt-renda">R$ 0,00</p>
+                        <p class="text-[11px] opacity-80 mt-1" id="txt-quinto-dia"><i class="ph ph-calendar"></i> Carregando datas...</p>
+                    </div>
+                </div>
+
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Resumo Geral</h2>
+                    <h2 class="text-xl font-bold">Resumo Fatura</h2>
                     <input type="month" id="resumo-mes" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
-                <div class="mb-6">
-                    <label class="block text-sm text-gray-500 mb-1">Filtrar por Cartão:</label>
-                    <select id="filtro-cartao" class="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="todos">Todos os Cartões</option>
-                        <!-- Renderizado via JS dinamicamente -->
-                    </select>
-                </div>
+                <select id="filtro-cartao-resumo" class="w-full px-4 py-2 mb-6 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="todos">Todos os Cartões</option>
+                </select>
 
-                <!-- Resumo Dinâmico por Pessoas -->
-                <div class="mb-4">
-                    <h3 class="text-sm font-semibold text-gray-500 mb-2">Divisão da Fatura do Cartão</h3>
-                    <div id="grid-pessoas-resumo" class="grid grid-cols-2 gap-3">
-                        <!-- Renderizado via JS dinamicamente -->
+                <!-- Gráfico Dashboard -->
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+                    <h3 class="text-sm font-semibold text-gray-500 mb-2">Gastos por Categoria</h3>
+                    <div class="relative h-48 w-full">
+                        <canvas id="graficoDashboard"></canvas>
                     </div>
                 </div>
+
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-gray-500 mb-2">Divisão de Pagadores</h3>
+                    <div id="grid-pessoas-resumo" class="grid grid-cols-2 gap-3"></div>
+                </div>
                 
-                <div class="bg-brand-500 text-white p-4 rounded-2xl shadow-sm mb-8">
-                    <p class="text-sm opacity-80">Total Fatura (Compras + Parcelas)</p>
-                    <p class="text-3xl font-bold mt-1" id="total-fatura">R$ 0,00</p>
+                <div class="bg-brand-500 text-white p-4 rounded-2xl shadow-sm mb-8 relative">
+                    <p class="text-sm opacity-80">Total Fatura (Compras + Assinaturas)</p>
+                    <div class="flex justify-between items-end">
+                        <p class="text-3xl font-bold mt-1" id="total-fatura">R$ 0,00</p>
+                        <button onclick="document.getElementById('adiantamento-modal').classList.remove('hidden')" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors font-medium">
+                            + Adiantar Fatura
+                        </button>
+                    </div>
+                    <p id="txt-adiantamentos" class="text-xs mt-2 text-green-200 hidden"></p>
                 </div>
 
-                <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph ph-shopping-cart"></i> Detalhamento Cartão</h3>
-                <div id="lista-compras-mes" class="space-y-3 mb-8">
-                    <!-- Compras renderizadas via JS -->
-                </div>
+                <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph ph-list-dashes"></i> Detalhamento da Fatura</h3>
+                <div id="lista-compras-mes" class="space-y-3 mb-8"></div>
             </section>
 
-            <!-- ABA 2: NOVA COMPRA CARTÃO E LISTA DE CARTÕES -->
+            <!-- ABA 2: NOVA COMPRA CARTÃO -->
             <section id="tab-compra" class="tab-content">
                 <h2 class="text-xl font-bold mb-6">Registrar no Cartão</h2>
                 <form id="form-compra" class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
@@ -234,13 +260,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm text-gray-500 mb-1">Categoria</label>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-sm text-gray-500">Categoria</label>
+                            <button type="button" onclick="document.getElementById('categoria-modal').classList.remove('hidden')" class="text-xs text-brand-500 font-bold hover:underline">Configurar</button>
+                        </div>
                         <select id="c-categoria" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-                            <option>Alimentação</option>
-                            <option>Casa / Mercado</option>
-                            <option>Lazer</option>
-                            <option>Roupas</option>
-                            <option>Outros</option>
+                            <!-- Preenchido via JS -->
                         </select>
                     </div>
 
@@ -254,9 +279,7 @@
                                 <label class="block text-sm text-gray-500">Cartão</label>
                                 <button type="button" onclick="openCartaoModal()" class="text-xs text-brand-500 font-bold hover:underline">+ Novo</button>
                             </div>
-                            <select id="c-cartao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-                                <!-- Preenchido via JS -->
-                            </select>
+                            <select id="c-cartao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500"></select>
                         </div>
                     </div>
 
@@ -265,30 +288,19 @@
                             <label class="block text-sm text-gray-500">Quem comprou/passou o cartão?</label>
                             <button type="button" onclick="openPersonModal()" class="text-xs text-brand-500 font-bold hover:underline">+ Nova Pessoa</button>
                         </div>
-                        <select id="c-comprador" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-                            <!-- Preenchido via JS -->
-                        </select>
+                        <select id="c-comprador" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500"></select>
                     </div>
 
                     <div class="p-3 bg-brand-50 dark:bg-brand-900/10 rounded-xl border border-brand-100 dark:border-brand-900/30">
                         <label class="block text-sm font-semibold text-brand-600 dark:text-brand-400 mb-2">Quem vai pagar a fatura?</label>
-                        <p class="text-xs text-gray-500 mb-3">Marque todas as pessoas que vão dividir essa conta.</p>
-                        <div id="c-pagadores-container" class="grid grid-cols-2 gap-2">
-                            <!-- Checkboxes renderizados via JS -->
-                        </div>
+                        <div id="c-pagadores-container" class="grid grid-cols-2 gap-2"></div>
                     </div>
 
-                    <button type="submit" class="w-full mt-4 bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 rounded-lg transition-colors">
-                        Salvar Compra
-                    </button>
+                    <button type="submit" class="w-full mt-4 bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 rounded-lg transition-colors">Salvar Compra</button>
                 </form>
 
-                <!-- LISTA DE CARTÕES -->
                 <h3 class="font-bold mb-3 mt-8 flex items-center gap-2"><i class="ph ph-cards"></i> Meus Cartões</h3>
-                <div id="lista-meus-cartoes" class="space-y-3 mb-8">
-                    <!-- Cartões renderizados via JS -->
-                </div>
-
+                <div id="lista-meus-cartoes" class="space-y-3 mb-8"></div>
             </section>
 
             <!-- ABA 3: EMPRÉSTIMOS -->
@@ -309,9 +321,7 @@
                             <input type="date" id="e-data" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                     </div>
-                    <button type="submit" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg transition-colors">
-                        Salvar Empréstimo
-                    </button>
+                    <button type="submit" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg transition-colors">Salvar Empréstimo</button>
                 </form>
                 <h3 class="font-bold mb-3">Histórico de Empréstimos</h3>
                 <div id="lista-todos-emprestimos" class="space-y-3"></div>
@@ -320,18 +330,18 @@
             <!-- ABA 4: CONTAS E DÍVIDAS FIXAS -->
             <section id="tab-contas" class="tab-content">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold">Minhas Contas / Dívidas</h2>
+                    <h2 class="text-xl font-bold">Contas & Assinaturas</h2>
                 </div>
 
                 <form id="form-conta" class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4 mb-8">
                     <div>
-                        <label class="block text-sm text-gray-500 mb-1">Descrição (Ex: Seguro Moto, Carnê)</label>
+                        <label class="block text-sm text-gray-500 mb-1">Descrição</label>
                         <input type="text" id="cf-descricao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm text-gray-500 mb-1">Valor da Parcela</label>
+                            <label class="block text-sm text-gray-500 mb-1">Valor</label>
                             <input type="number" step="0.01" id="cf-valor" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
@@ -344,7 +354,7 @@
                         <div>
                             <label class="block text-sm text-gray-500 mb-1">Tipo de Conta</label>
                             <select id="cf-tipo" onchange="toggleParcelasContas()" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="Fixa">Mensal / Fixa</option>
+                                <option value="Fixa">Mensal / Assinatura</option>
                                 <option value="Parcelada">Dívida Parcelada</option>
                             </select>
                         </div>
@@ -354,20 +364,31 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors">
-                        Cadastrar Conta
-                    </button>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">Cobrar na fatura do Cartão?</label>
+                        <select id="cf-cartao-vinculo" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Não (Boleto/Pix)</option>
+                            <!-- Preenchido via JS com os cartões -->
+                        </select>
+                        <p class="text-[10px] text-gray-400 mt-1">Ao vincular, o valor será somado à fatura do cartão escolhido todo mês.</p>
+                    </div>
+
+                    <button type="submit" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors">Cadastrar Conta</button>
                 </form>
 
-                <h3 class="font-bold mb-3 flex items-center gap-2"><i class="ph ph-calendar-check"></i> Contas deste mês (<span id="lbl-mes-contas"></span>)</h3>
-                <div id="lista-contas-mes" class="space-y-3 mb-8">
-                    <!-- Contas do Mês renderizadas via JS -->
+                <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 p-4 rounded-2xl mb-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm font-semibold text-blue-700 dark:text-blue-400">Total de Contas (<span id="lbl-mes-contas"></span>)</p>
+                        <p class="text-[10px] text-blue-600/70 dark:text-blue-400/70">Soma de boletos e parcelas do mês</p>
+                    </div>
+                    <p class="text-xl font-bold text-blue-700 dark:text-blue-400" id="total-contas-mes">R$ 0,00</p>
                 </div>
-            </section>
 
+                <div id="lista-contas-mes" class="space-y-3 mb-8"></div>
+            </section>
         </main>
 
-        <!-- Bottom Navigation -->
+        <!-- Navegação Inferior -->
         <nav class="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
             <div class="max-w-md mx-auto flex justify-between px-4 py-2">
                 <button onclick="switchTab('resumo')" class="nav-btn flex flex-col items-center p-2 text-brand-500 w-1/4" data-target="resumo">
@@ -380,7 +401,7 @@
                 </button>
                 <button onclick="switchTab('contas')" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-blue-500 transition-colors w-1/4" data-target="contas">
                     <i class="ph ph-receipt text-2xl"></i>
-                    <span class="text-[10px] mt-1 font-medium whitespace-nowrap">Contas/Dívidas</span>
+                    <span class="text-[10px] mt-1 font-medium whitespace-nowrap">Contas</span>
                 </button>
                 <button onclick="switchTab('emprestimo')" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-emerald-500 transition-colors w-1/4" data-target="emprestimo">
                     <i class="ph ph-hand-coins text-2xl"></i>
@@ -390,37 +411,30 @@
         </nav>
     </div>
 
-    <!-- SUPABASE CLIENT INTEGRATION -->
     <script type="module">
         import { createClient } from '@supabase/supabase-js';
 
-        // Usa as variáveis de ambiente configuradas no seu .env via Vite
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Estado Global
         let currentUser = null;
-        let comprasData = [];
-        let emprestimosData = [];
-        let pessoasData = [];
-        let contasData = [];
-        let pagamentosData = [];
-        let cartoesData = [];
+        let comprasData = [], emprestimosData = [], pessoasData = [], contasData = [], pagamentosData = [], cartoesData = [], categoriasData = [], rendasData = [], adiantamentosData = [];
+        let dashboardChart = null;
 
-        // UI Setup
         const hoje = new Date();
         document.getElementById('c-data').value = hoje.toISOString().split('T')[0];
         document.getElementById('e-data').value = hoje.toISOString().split('T')[0];
-        
-        const mesAtual = (hoje.getMonth() + 1).toString().padStart(2, '0');
-        const anoAtual = hoje.getFullYear();
-        document.getElementById('resumo-mes').value = `${anoAtual}-${mesAtual}`;
+
+        // Lógica para abrir sempre na fatura do próximo mês
+        const dataProximaFatura = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+        const mesFatura = (dataProximaFatura.getMonth() + 1).toString().padStart(2, '0');
+        const anoFatura = dataProximaFatura.getFullYear();
+        document.getElementById('resumo-mes').value = `${anoFatura}-${mesFatura}`;
 
         // ==========================================
-        // 1. AUTENTICAÇÃO
+        // 1. AUTENTICAÇÃO E CARREGAMENTO
         // ==========================================
-        
         supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 currentUser = session.user;
@@ -440,668 +454,446 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('auth-error');
-            
             try {
                 btn.innerText = "Carregando...";
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
-                
                 if (error) throw error;
                 errorDiv.classList.add('hidden');
             } catch (error) {
-                errorDiv.innerText = "Erro ao entrar: " + (error.message === "Invalid login credentials" ? "Senha ou email incorretos." : error.message);
+                errorDiv.innerText = "Erro ao entrar: " + error.message;
                 errorDiv.classList.remove('hidden');
-            } finally {
-                btn.innerText = "Entrar";
-            }
+            } finally { btn.innerText = "Entrar"; }
         });
 
         document.getElementById('btn-register').addEventListener('click', async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('auth-error');
-
-            if (!email || password.length < 6) {
-                errorDiv.innerText = "Preencha um email válido e uma senha de no mínimo 6 caracteres.";
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
+            if (!email || password.length < 6) return (errorDiv.innerText = "Email e senha (mínimo 6 caracteres).", errorDiv.classList.remove('hidden'));
+            
             const btn = document.getElementById('btn-register');
             try {
                 btn.innerText = "Criando...";
                 const { error } = await supabase.auth.signUp({ email, password });
-                
                 if (error) throw error;
                 errorDiv.classList.add('hidden');
-                showToast("Conta criada! Pode realizar o login.");
+                showToast("Conta criada!");
             } catch (error) {
                 errorDiv.innerText = "Erro ao criar conta: " + error.message;
                 errorDiv.classList.remove('hidden');
-            } finally {
-                btn.innerText = "Criar nova conta";
-            }
+            } finally { btn.innerText = "Criar nova conta"; }
         });
 
-        document.getElementById('btn-logout').addEventListener('click', async () => {
-            await supabase.auth.signOut();
-        });
+        document.getElementById('btn-logout').addEventListener('click', () => supabase.auth.signOut());
 
-        // ==========================================
-        // 2. BUSCA DE DADOS
-        // ==========================================
         async function carregarDados() {
             if (!currentUser) return;
-
-            const fetchTable = async (table) => {
-                const { data, error } = await supabase.from(table).select('*').eq('user_id', currentUser.id);
-                if (error) {
-                    console.error(`Erro ao buscar ${table}:`, error);
-                    return [];
-                }
-                return data;
+            const fetchT = async (table) => {
+                const { data } = await supabase.from(table).select('*').eq('user_id', currentUser.id);
+                return data || [];
             };
 
-            [pessoasData, comprasData, emprestimosData, contasData, pagamentosData, cartoesData] = await Promise.all([
-                fetchTable('pessoas'),
-                fetchTable('compras'),
-                fetchTable('emprestimos'),
-                fetchTable('contas'),
-                fetchTable('pagamentos'),
-                fetchTable('cartoes')
+            [pessoasData, comprasData, emprestimosData, contasData, pagamentosData, cartoesData, categoriasData, rendasData, adiantamentosData] = await Promise.all([
+                fetchT('pessoas'), fetchT('compras'), fetchT('emprestimos'), fetchT('contas'), 
+                fetchT('pagamentos'), fetchT('cartoes'), fetchT('categorias'), fetchT('rendas'), fetchT('adiantamentos')
             ]);
 
-            // Criações Padrões caso seja o primeiro acesso
+            // Dados Iniciais (Primeiro Acesso)
             if (pessoasData.length === 0) {
-                const { error } = await supabase.from('pessoas').insert([
-                    { nome: 'Eu', user_id: currentUser.id },
-                    { nome: 'Mainha', user_id: currentUser.id }
-                ]);
-                if (!error) pessoasData = await fetchTable('pessoas');
+                await supabase.from('pessoas').insert([{ nome: 'Eu', user_id: currentUser.id }]);
+                pessoasData = await fetchT('pessoas');
+            }
+            if (categoriasData.length === 0) {
+                const catIniciais = ['Alimentação', 'Transporte', 'Lazer', 'Casa', 'Saúde', 'Outros'].map(c => ({nome: c, user_id: currentUser.id}));
+                await supabase.from('categorias').insert(catIniciais);
+                categoriasData = await fetchT('categorias');
             }
 
-            renderizarSelectPessoas();
-            renderizarSelectCartoes();
+            renderizarSelects();
             atualizarResumo();
             renderizarContas();
             renderizarEmprestimos();
+            calcularRenda();
         }
 
         // ==========================================
-        // 3. INSERÇÕES
+        // 2. LÓGICA DE NEGÓCIO E UI COMPONENTES
         // ==========================================
-
-        window.openPersonModal = () => document.getElementById('person-modal').classList.remove('hidden');
         
-        document.getElementById('btn-save-person').addEventListener('click', async () => {
-            const nome = document.getElementById('new-person-name').value.trim();
-            if(!nome) return uiAlert("Digite um nome!");
+        function calcularRenda() {
+            const inputMes = document.getElementById('resumo-mes').value;
+            const [ano, mes] = inputMes.split('-').map(Number);
+            const ultimaRenda = rendasData.sort((a,b) => new Date(b.criado_em) - new Date(a.criado_em))[0];
+            const valorRenda = ultimaRenda ? ultimaRenda.valor : 0;
             
-            const btn = document.getElementById('btn-save-person');
-            btn.innerText = "Salvando...";
-
-            const { error } = await supabase.from('pessoas').insert([{ nome, user_id: currentUser.id }]);
+            document.getElementById('txt-renda').innerText = formatarMoeda(valorRenda);
             
-            if (!error) {
-                document.getElementById('new-person-name').value = '';
-                document.getElementById('person-modal').classList.add('hidden');
-                showToast("Pessoa adicionada!");
-                await carregarDados();
-            } else {
-                uiAlert("Erro ao salvar pessoa.");
+            // Algoritmo 5º dia útil
+            let dia = 1, diasUteis = 0;
+            while (diasUteis < 5) {
+                let data = new Date(ano, mes - 1, dia);
+                let diaSemana = data.getDay();
+                if (diaSemana !== 0 && diaSemana !== 6) diasUteis++; // IGNORA SAB E DOM
+                if (diasUteis < 5) dia++;
             }
-            btn.innerText = "Salvar";
-        });
-
-        // ADICIONAR CARTÃO
-        window.openCartaoModal = () => document.getElementById('cartao-modal').classList.remove('hidden');
-        
-        document.getElementById('btn-save-cartao').addEventListener('click', async () => {
-            const nome = document.getElementById('new-cartao-nome').value.trim();
-            const diaFechamento = parseInt(document.getElementById('new-cartao-fechamento').value);
-            const diaVencimento = parseInt(document.getElementById('new-cartao-vencimento').value);
-
-            if(!nome || !diaFechamento || !diaVencimento) return uiAlert("Preencha todos os campos do cartão!");
-            if(diaFechamento < 1 || diaFechamento > 31 || diaVencimento < 1 || diaVencimento > 31) return uiAlert("Dias devem ser entre 1 e 31.");
-            
-            const btn = document.getElementById('btn-save-cartao');
-            btn.innerText = "Salvando...";
-
-            const { error } = await supabase.from('cartoes').insert([{ 
-                nome, dia_fechamento: diaFechamento, dia_vencimento: diaVencimento, user_id: currentUser.id 
-            }]);
-            
-            if (!error) {
-                document.getElementById('new-cartao-nome').value = '';
-                document.getElementById('new-cartao-fechamento').value = '';
-                document.getElementById('new-cartao-vencimento').value = '';
-                document.getElementById('cartao-modal').classList.add('hidden');
-                showToast("Cartão adicionado!");
-                await carregarDados();
-            } else {
-                uiAlert("Erro ao salvar cartão.");
-            }
-            btn.innerText = "Salvar";
-        });
-
-        // SALVAR COMPRA (COM LÓGICA DO CARTÃO ESCOLHIDO)
-        document.getElementById('form-compra').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            
-            const pagadoresCheckboxes = document.querySelectorAll('.pagador-cb:checked');
-            if(pagadoresCheckboxes.length === 0) {
-                return uiAlert("Selecione pelo menos uma pessoa que vai pagar a fatura!");
-            }
-
-            const cartaoId = document.getElementById('c-cartao').value;
-            const cartaoSelecionado = cartoesData.find(c => c.id === cartaoId);
-            
-            if(!cartaoSelecionado) {
-                return uiAlert("Cadastre e selecione um cartão primeiro!");
-            }
-            
-            btn.innerText = "Salvando...";
-            const pagadoresList = Array.from(pagadoresCheckboxes).map(cb => cb.value);
-            
-            // Lógica Inteligente de Fechamento Baseado no Cartão Escolhido
-            const dataCompraStr = document.getElementById('c-data').value;
-            const dataCompra = new Date(dataCompraStr + "T12:00:00");
-            
-            const diaCompra = dataCompra.getDate();
-            let mesInicio = dataCompra.getMonth() + 1;
-            let anoInicio = dataCompra.getFullYear();
-            
-            const diaFechamento = cartaoSelecionado.dia_fechamento;
-
-            // Se comprou no dia do fechamento ou depois, a fatura pula para o mês seguinte
-            if (diaCompra >= diaFechamento) {
-                mesInicio++;
-                if (mesInicio > 12) {
-                    mesInicio = 1;
-                    anoInicio++;
-                }
-            }
-
-            const novaCompra = {
-                user_id: currentUser.id,
-                cartao_id: cartaoSelecionado.id, // Vínculo com o cartão
-                descricao: document.getElementById('c-descricao').value,
-                valor_total: parseFloat(document.getElementById('c-valor').value),
-                data_compra: dataCompraStr,
-                mes_inicio: mesInicio,
-                ano_inicio: anoInicio,
-                categoria: document.getElementById('c-categoria').value,
-                parcelas: parseInt(document.getElementById('c-parcelas').value),
-                comprador: document.getElementById('c-comprador').value,
-                pagadores: pagadoresList
-            };
-
-            const { error } = await supabase.from('compras').insert([novaCompra]);
-            
-            if (!error) {
-                showToast("Compra salva!");
-                e.target.reset();
-                document.getElementById('c-data').value = hoje.toISOString().split('T')[0];
-                await carregarDados();
-                switchTab('resumo');
-            } else {
-                uiAlert("Erro ao salvar compra: " + error.message);
-            }
-            btn.innerText = "Salvar Compra";
-        });
-
-        document.getElementById('form-conta').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerText = "Cadastrando...";
-            
-            const tipo = document.getElementById('cf-tipo').value;
-            const dataInicioStr = document.getElementById('resumo-mes').value + "-01";
-
-            const novaConta = {
-                user_id: currentUser.id,
-                descricao: document.getElementById('cf-descricao').value,
-                valor: parseFloat(document.getElementById('cf-valor').value),
-                dia_vencimento: parseInt(document.getElementById('cf-dia').value),
-                tipo: tipo,
-                parcelas_totais: tipo === 'Parcelada' ? parseInt(document.getElementById('cf-parcelas').value) : 999,
-                data_inicio: dataInicioStr
-            };
-
-            const { error } = await supabase.from('contas').insert([novaConta]);
-            
-            if (!error) {
-                showToast("Conta registrada!");
-                e.target.reset();
-                await carregarDados();
-            } else {
-                uiAlert("Erro ao cadastrar: " + error.message);
-            }
-            btn.innerText = "Cadastrar Conta";
-        });
-
-        document.getElementById('form-emprestimo').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerText = "Salvando...";
-
-            const novoEmprestimo = {
-                user_id: currentUser.id,
-                destinatario: document.getElementById('e-nome').value,
-                valor: parseFloat(document.getElementById('e-valor').value),
-                data: document.getElementById('e-data').value,
-                status: 'Pendente'
-            };
-
-            const { error } = await supabase.from('emprestimos').insert([novoEmprestimo]);
-            
-            if (!error) {
-                showToast("Empréstimo salvo!");
-                e.target.reset();
-                document.getElementById('e-data').value = hoje.toISOString().split('T')[0];
-                await carregarDados();
-            } else {
-                uiAlert("Erro ao salvar empréstimo: " + error.message);
-            }
-            btn.innerText = "Salvar Empréstimo";
-        });
-
-        // ==========================================
-        // 4. ATUALIZAÇÕES E DELEÇÕES
-        // ==========================================
-
-        window.togglePagamentoConta = async (conta_id, mes_ano, novoStatus) => {
-            if (!currentUser) return;
-            const pagamentoExistente = pagamentosData.find(p => p.conta_id === conta_id && p.mes_ano === mes_ano);
-            
-            if (pagamentoExistente) {
-                await supabase.from('pagamentos')
-                    .update({ status: novoStatus })
-                    .eq('id', pagamentoExistente.id);
-            } else {
-                await supabase.from('pagamentos').insert([{
-                    user_id: currentUser.id,
-                    conta_id: conta_id,
-                    mes_ano: mes_ano,
-                    status: novoStatus
-                }]);
-            }
-            await carregarDados();
+            document.getElementById('txt-quinto-dia').innerHTML = `<i class="ph ph-calendar"></i> Você recebe no dia ${dia.toString().padStart(2, '0')}/${mes.toString().padStart(2, '0')}`;
         }
 
-        window.toggleEmprestimoStatus = async (id, statusAtual) => {
-            if (!currentUser) return;
-            const novoStatus = statusAtual === 'Pendente' ? 'Devolvido' : 'Pendente';
-            await supabase.from('emprestimos').update({ status: novoStatus }).eq('id', id);
-            await carregarDados();
+        window.configurarRenda = () => {
+            const valor = prompt("Qual o valor da sua Renda Mensal?");
+            if(valor && !isNaN(valor.replace(',','.'))) {
+                supabase.from('rendas').insert([{ user_id: currentUser.id, valor: parseFloat(valor.replace(',','.')) }])
+                    .then(() => { showToast("Renda atualizada!"); carregarDados(); });
+            }
         };
 
-        window.deletarItem = (tabela, id) => {
-            uiConfirm("Deseja mesmo apagar este registro?", async () => {
-                const { error } = await supabase.from(tabela).delete().eq('id', id);
-                if (error) {
-                    uiAlert("Não foi possível apagar. O registro pode estar atrelado a compras existentes.");
-                } else {
-                    showToast("Registro apagado.");
-                    await carregarDados();
-                }
-            });
-        }
-
-        window.deletarPessoa = (id, nome) => {
-            if(pessoasData.length <= 1) return uiAlert("Você não pode apagar todas as pessoas!");
-            uiConfirm(`Apagar ${nome} das opções? (As contas antigas não serão apagadas)`, async () => {
-                const { error } = await supabase.from('pessoas').delete().eq('id', id);
-                if (error) {
-                    uiAlert("Erro ao apagar. Esta pessoa pode estar vinculada a outras funções.");
-                } else {
-                    showToast("Pessoa removida.");
-                    await carregarDados();
-                }
-            });
-        }
-
-        // ==========================================
-        // 5. RENDERIZAÇÃO E LÓGICA DE UI
-        // ==========================================
-
-        window.uiAlert = (msg) => {
-            document.getElementById('alert-msg').innerText = msg;
-            document.getElementById('alert-modal').classList.remove('hidden');
-        }
-
-        window.uiConfirm = (msg, callback) => {
-            document.getElementById('confirm-msg').innerText = msg;
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.remove('hidden');
-            
-            document.getElementById('confirm-yes').onclick = () => { 
-                modal.classList.add('hidden'); 
-                callback(); 
-            };
-            document.getElementById('confirm-no').onclick = () => modal.classList.add('hidden');
-        }
-
-        function renderizarSelectCartoes() {
+        function renderizarSelects() {
+            // Cartoes
             const selectCartao = document.getElementById('c-cartao');
-            const filtroCartao = document.getElementById('filtro-cartao');
-            const listaMeusCartoes = document.getElementById('lista-meus-cartoes');
+            const selectFiltroResumo = document.getElementById('filtro-cartao-resumo');
+            const selectCartaoVinc = document.getElementById('cf-cartao-vinculo');
+            const listaCartoes = document.getElementById('lista-meus-cartoes');
             
             selectCartao.innerHTML = '';
-            filtroCartao.innerHTML = '<option value="todos">Todos os Cartões</option>';
-            listaMeusCartoes.innerHTML = '';
-            
-            if (cartoesData.length === 0) {
-                listaMeusCartoes.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhum cartão cadastrado. Clique em "+ Novo" para adicionar.</p>`;
-            }
+            selectFiltroResumo.innerHTML = '<option value="todos">Todos os Cartões</option>';
+            selectCartaoVinc.innerHTML = '<option value="">Não vincular (Boleto/Pix)</option>';
+            listaCartoes.innerHTML = cartoesData.length === 0 ? `<p class="text-sm text-gray-500">Nenhum cartão cadastrado.</p>` : '';
 
             cartoesData.forEach(c => {
                 selectCartao.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
-                filtroCartao.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
-                
-                listaMeusCartoes.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                                <i class="ph ph-credit-card text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-sm">${c.nome}</p>
-                                <p class="text-xs text-gray-500">
-                                    Fecha dia ${c.dia_fechamento} • Vence dia ${c.dia_vencimento}
-                                </p>
-                            </div>
-                        </div>
-                        <button onclick="deletarItem('cartoes', '${c.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity" title="Apagar Cartão">
-                            <i class="ph ph-trash"></i>
-                        </button>
-                    </div>
-                `;
+                selectFiltroResumo.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                selectCartaoVinc.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+                listaCartoes.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between">
+                        <div><p class="font-medium text-sm">${c.nome}</p><p class="text-xs text-gray-500">Fechamento: dia ${c.dia_fechamento} • Vencimento: dia ${c.dia_vencimento}</p></div>
+                        <button onclick="deletarItem('cartoes', '${c.id}')" class="text-red-500 p-2"><i class="ph ph-trash"></i></button>
+                    </div>`;
             });
-        }
 
-        function renderizarSelectPessoas() {
+            // Categorias
+            const selectCategoria = document.getElementById('c-categoria');
+            const listaCategorias = document.getElementById('lista-categorias-modal');
+            selectCategoria.innerHTML = ''; listaCategorias.innerHTML = '';
+            categoriasData.forEach(c => {
+                selectCategoria.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                listaCategorias.innerHTML += `<div class="flex justify-between items-center py-1"><span class="text-sm">${c.nome}</span><button onclick="deletarItem('categorias', '${c.id}')" class="text-red-500"><i class="ph ph-trash"></i></button></div>`;
+            });
+
+            // Pessoas
             const selectComprador = document.getElementById('c-comprador');
             const containerPagadores = document.getElementById('c-pagadores-container');
-            
-            selectComprador.innerHTML = '';
-            containerPagadores.innerHTML = '';
-
+            selectComprador.innerHTML = ''; containerPagadores.innerHTML = '';
             pessoasData.forEach((p, idx) => {
                 selectComprador.innerHTML += `<option value="${p.nome}">${p.nome}</option>`;
-                
                 const isChecked = idx === 0 ? 'checked' : ''; 
                 containerPagadores.innerHTML += `
-                    <label class="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-brand-500 transition-colors">
-                        <input type="checkbox" value="${p.nome}" class="pagador-cb w-4 h-4 text-brand-500 rounded focus:ring-brand-500" ${isChecked}>
-                        <span class="text-sm font-medium">${p.nome}</span>
-                    </label>
-                `;
+                    <label class="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer">
+                        <input type="checkbox" value="${p.nome}" class="pagador-cb w-4 h-4 text-brand-500" ${isChecked}>
+                        <span class="text-sm">${p.nome}</span>
+                    </label>`;
             });
         }
 
-        document.getElementById('resumo-mes').addEventListener('change', () => {
-            atualizarResumo();
-            renderizarContas();
-        });
-
-        document.getElementById('filtro-cartao').addEventListener('change', () => {
-            atualizarResumo();
-        });
+        // ==========================================
+        // 3. ATUALIZAÇÃO DA FATURA (A MÁGICA)
+        // ==========================================
+        document.getElementById('resumo-mes').addEventListener('change', () => { atualizarResumo(); renderizarContas(); calcularRenda(); });
+        document.getElementById('filtro-cartao-resumo').addEventListener('change', atualizarResumo);
 
         function atualizarResumo() {
             if(pessoasData.length === 0) return;
             const inputMes = document.getElementById('resumo-mes').value;
+            const cartaoFiltro = document.getElementById('filtro-cartao-resumo').value;
             if(!inputMes) return;
             
             const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
-            const cartaoFiltrado = document.getElementById('filtro-cartao').value;
+            let totaisPorPessoa = {}; pessoasData.forEach(p => totaisPorPessoa[p.nome] = 0);
             
-            let totaisPorPessoa = {};
-            pessoasData.forEach(p => totaisPorPessoa[p.nome] = 0);
-            
-            let totalGeral = 0;
-            let comprasDoMes = [];
+            let totalFatura = 0;
+            let totalAdiantado = 0;
+            let faturaItems = [];
+            let dadosGrafico = {};
 
+            // 1. Processar Compras do Cartão
             comprasData.forEach(compra => {
-                // Aplica o filtro de cartão antes de calcular
-                if (cartaoFiltrado !== 'todos' && compra.cartao_id !== cartaoFiltrado) return;
-
-                const mesesDiferenca = (anoSelecionado - compra.ano_inicio) * 12 + (mesSelecionado - compra.mes_inicio);
+                if(cartaoFiltro !== 'todos' && compra.cartao_id !== cartaoFiltro) return;
                 
+                const mesesDiferenca = (anoSelecionado - compra.ano_inicio) * 12 + (mesSelecionado - compra.mes_inicio);
                 if (mesesDiferenca >= 0 && mesesDiferenca < compra.parcelas) {
                     const valorParcela = compra.valor_total / compra.parcelas;
-                    const numeroParcelaAtual = mesesDiferenca + 1;
-                    
                     const numPagadores = compra.pagadores ? compra.pagadores.length : 1;
                     const valorPorPessoa = valorParcela / numPagadores;
-
-                    let textoDivisaoArr = [];
-
+                    
                     if (compra.pagadores) {
-                        compra.pagadores.forEach(pagador => {
-                            if(totaisPorPessoa[pagador] !== undefined) {
-                                totaisPorPessoa[pagador] += valorPorPessoa;
-                            }
-                            textoDivisaoArr.push(pagador);
-                        });
+                        compra.pagadores.forEach(pagador => { if(totaisPorPessoa[pagador] !== undefined) totaisPorPessoa[pagador] += valorPorPessoa; });
                     }
 
-                    totalGeral += valorParcela;
-                    
-                    // Identifica o nome do cartão usado
-                    const cartaoVinculado = cartoesData.find(c => c.id === compra.cartao_id);
-                    const nomeCartao = cartaoVinculado ? cartaoVinculado.nome : 'Cartão Excluído';
+                    totalFatura += valorParcela;
+                    dadosGrafico[compra.categoria] = (dadosGrafico[compra.categoria] || 0) + valorParcela;
 
-                    comprasDoMes.push({
-                        ...compra,
-                        valorParcela,
-                        numeroParcelaAtual,
-                        nomeCartao,
-                        textoDivisao: numPagadores === 1 ? `100% ${textoDivisaoArr[0] || 'Alguém'}` : `Div. entre ${numPagadores}`
+                    const cartaoNome = cartoesData.find(c => c.id === compra.cartao_id)?.nome || 'Cartão Apagado';
+                    faturaItems.push({
+                        ...compra, valorExibir: valorParcela, subtitulo: `${cartaoNome} • Parc. ${mesesDiferenca + 1}/${compra.parcelas}`,
+                        icone: 'ph-credit-card', timestampFormatado: `${formatarData(compra.data_compra)} (Reg: ${formatarDataHora(compra.criado_em)})`
                     });
                 }
             });
 
-            const gridPessoas = document.getElementById('grid-pessoas-resumo');
-            gridPessoas.innerHTML = '';
-            
-            pessoasData.forEach((p, idx) => {
-                const valor = totaisPorPessoa[p.nome] || 0;
-                const colors = ['text-brand-500', 'text-pink-500', 'text-blue-500', 'text-emerald-500', 'text-orange-500'];
-                const color = colors[idx % colors.length];
+            // 2. Processar Assinaturas/Contas vinculadas aos Cartões filtrados
+            contasData.forEach(conta => {
+                if(!conta.cartao_id) return; // Se não tem cartão, ignora (Boleto/Pix não vai pra fatura)
+                if(cartaoFiltro !== 'todos' && conta.cartao_id !== cartaoFiltro) return;
 
-                gridPessoas.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium z-10 relative">${p.nome}</p>
-                        <p class="text-xl font-bold ${color} mt-1 z-10 relative">${formatarMoeda(valor)}</p>
-                        <button onclick="deletarPessoa('${p.id}', '${p.nome}')" class="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-20" title="Apagar Pessoa">
-                            <i class="ph ph-trash"></i>
-                        </button>
-                    </div>
-                `;
+                const dataInicio = new Date(conta.data_inicio + "T12:00:00");
+                const mesesDiferenca = (anoSelecionado - dataInicio.getFullYear()) * 12 + (mesSelecionado - (dataInicio.getMonth() + 1));
+                
+                if (mesesDiferenca >= 0 && mesesDiferenca < conta.parcelas_totais) {
+                    totalFatura += conta.valor;
+                    totaisPorPessoa['Eu'] += conta.valor; // Assume que quem paga a assinatura do cartão é o dono
+                    dadosGrafico['Assinaturas'] = (dadosGrafico['Assinaturas'] || 0) + conta.valor;
+
+                    const cartaoNome = cartoesData.find(c => c.id === conta.cartao_id)?.nome || 'Cartão Apagado';
+                    faturaItems.push({
+                        id: conta.id, descricao: conta.descricao, valorExibir: conta.valor, subtitulo: `Assinatura via ${cartaoNome}`,
+                        icone: 'ph-repeat', timestampFormatado: `Iniciado em ${formatarData(conta.data_inicio)}`
+                    });
+                }
             });
 
-            document.getElementById('total-fatura').innerText = formatarMoeda(totalGeral);
+            // 3. Subtrair Adiantamentos
+            adiantamentosData.forEach(a => {
+                if (a.mes_ano === inputMes && (cartaoFiltro === 'todos' || a.cartao_id === cartaoFiltro)) {
+                    totalFatura -= a.valor;
+                    totalAdiantado += a.valor;
+                    totaisPorPessoa['Eu'] -= a.valor; // O abate entra pro dono
+                }
+            });
+
+            // RENDERIZAR TUDO
+            const gridPessoas = document.getElementById('grid-pessoas-resumo');
+            gridPessoas.innerHTML = '';
+            pessoasData.forEach((p, idx) => {
+                const colors = ['text-brand-500', 'text-pink-500', 'text-blue-500', 'text-emerald-500', 'text-orange-500'];
+                gridPessoas.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">${p.nome}</p>
+                        <p class="text-xl font-bold ${colors[idx % colors.length]} mt-1">${formatarMoeda(totaisPorPessoa[p.nome] || 0)}</p>
+                    </div>`;
+            });
+
+            document.getElementById('total-fatura').innerText = formatarMoeda(totalFatura);
+            
+            const txtAdiantamento = document.getElementById('txt-adiantamentos');
+            if(totalAdiantado > 0) {
+                txtAdiantamento.innerText = `Você adiantou ${formatarMoeda(totalAdiantado)} nesta fatura.`;
+                txtAdiantamento.classList.remove('hidden');
+            } else { txtAdiantamento.classList.add('hidden'); }
 
             const listaCompras = document.getElementById('lista-compras-mes');
-            listaCompras.innerHTML = '';
-            
-            if (comprasDoMes.length === 0) {
-                listaCompras.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhuma compra no cartão.</p>`;
-            } else {
-                comprasDoMes.sort((a,b) => new Date(b.data_compra) - new Date(a.data_compra));
-                comprasDoMes.forEach(c => {
-                    listaCompras.innerHTML += `
-                        <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                                    <i class="ph ph-credit-card text-lg"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">${c.descricao}</p>
-                                    <p class="text-xs text-gray-500">
-                                        <span class="font-semibold">${c.nomeCartao}</span> • ${c.parcelas > 1 ? `Parc. ${c.numeroParcelaAtual}/${c.parcelas}` : 'À vista'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="text-right flex items-center gap-2">
-                                <div>
-                                    <p class="font-bold text-sm">${formatarMoeda(c.valorParcela)}</p>
-                                    <p class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">${c.textoDivisao}</p>
-                                </div>
-                                <button onclick="deletarItem('compras', '${c.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i class="ph ph-trash"></i>
-                                </button>
+            listaCompras.innerHTML = faturaItems.length === 0 ? `<p class="text-gray-500 text-sm text-center py-4">Nenhuma movimentação.</p>` : '';
+            faturaItems.forEach(item => {
+                listaCompras.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700"><i class="ph ${item.icone} text-lg"></i></div>
+                            <div>
+                                <p class="font-medium text-sm">${item.descricao}</p>
+                                <p class="text-[10px] text-gray-400">${item.subtitulo}</p>
+                                <p class="text-[9px] text-gray-400 opacity-60">${item.timestampFormatado}</p>
                             </div>
                         </div>
-                    `;
+                        <div class="text-right flex items-center gap-2">
+                            <p class="font-bold text-sm">${formatarMoeda(item.valorExibir)}</p>
+                            ${item.pagadores ? `<button onclick="deletarItem('compras', '${item.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity"><i class="ph ph-trash"></i></button>` : ''}
+                        </div>
+                    </div>`;
+            });
+
+            // ATUALIZAR GRÁFICO (Chart.js)
+            const ctx = document.getElementById('graficoDashboard');
+            if(dashboardChart) dashboardChart.destroy();
+            
+            if(Object.keys(dadosGrafico).length > 0) {
+                dashboardChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(dadosGrafico),
+                        datasets: [{
+                            data: Object.values(dadosGrafico),
+                            backgroundColor: ['#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#14b8a6', '#f43f5e'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: localStorage.getItem('theme') === 'dark' ? '#fff' : '#333' } } } }
                 });
             }
         }
 
         function renderizarContas() {
             const inputMes = document.getElementById('resumo-mes').value;
-            if(!inputMes) return;
             const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
-            
-            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            document.getElementById('lbl-mes-contas').innerText = `${meses[mesSelecionado-1]}/${anoSelecionado}`;
-
             const lista = document.getElementById('lista-contas-mes');
             lista.innerHTML = '';
-            
-            let temConta = false;
+            let totalMesContas = 0;
 
             contasData.forEach(conta => {
                 const dataInicio = new Date(conta.data_inicio + "T12:00:00");
                 const mesesDiferenca = (anoSelecionado - dataInicio.getFullYear()) * 12 + (mesSelecionado - (dataInicio.getMonth() + 1));
-                
                 if (mesesDiferenca >= 0 && mesesDiferenca < conta.parcelas_totais) {
-                    temConta = true;
-                    
+                    totalMesContas += conta.valor;
                     const isPago = pagamentosData.some(p => p.conta_id === conta.id && p.mes_ano === inputMes && p.status === true);
-                    const corStatus = isPago ? 'text-green-500 bg-green-100 dark:bg-green-900/30' : 'text-blue-500 bg-blue-100 dark:bg-blue-900/30';
-                    const iconeStatus = isPago ? 'ph-check-circle' : 'ph-circle';
+                    const corStatus = isPago ? 'text-green-500 bg-green-100' : 'text-blue-500 bg-blue-100';
+                    const iconStatus = isPago ? 'ph-check-circle' : 'ph-circle';
                     
-                    const subtitulo = conta.tipo === 'Parcelada' ? `Parc. ${mesesDiferenca + 1}/${conta.parcelas_totais}` : `Recorrente`;
+                    let subtitulo = conta.tipo === 'Parcelada' ? `Parc. ${mesesDiferenca + 1}/${conta.parcelas_totais}` : `Recorrente`;
+                    if(conta.cartao_id) {
+                        const nomeC = cartoesData.find(c => c.id === conta.cartao_id)?.nome;
+                        subtitulo += ` • No cartão ${nomeC}`;
+                    }
 
                     lista.innerHTML += `
                         <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
                             <div class="flex items-center gap-3">
-                                <div onclick="togglePagamentoConta('${conta.id}', '${inputMes}', ${!isPago})" class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-colors ${corStatus}" title="Marcar como Pago/Pendente">
-                                    <i class="ph ${iconeStatus} text-xl"></i>
+                                <div onclick="togglePagamentoConta('${conta.id}', '${inputMes}', ${!isPago})" class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer ${corStatus}">
+                                    <i class="ph ${iconStatus} text-xl"></i>
                                 </div>
-                                <div>
-                                    <p class="font-medium text-sm ${isPago ? 'line-through text-gray-400' : ''}">${conta.descricao}</p>
-                                    <p class="text-xs text-gray-500">Vence dia ${conta.dia_vencimento} • ${subtitulo}</p>
-                                </div>
+                                <div><p class="font-medium text-sm ${isPago ? 'line-through text-gray-400' : ''}">${conta.descricao}</p><p class="text-xs text-gray-500">Vence dia ${conta.dia_vencimento} • ${subtitulo}</p></div>
                             </div>
                             <div class="text-right flex items-center gap-2">
                                 <p class="font-bold text-sm ${isPago ? 'text-gray-400' : ''}">${formatarMoeda(conta.valor)}</p>
-                                <button onclick="deletarItem('contas', '${conta.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i class="ph ph-trash"></i>
-                                </button>
+                                <button onclick="deletarItem('contas', '${conta.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100"><i class="ph ph-trash"></i></button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }
             });
-
-            if(!temConta) {
-                lista.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhuma conta para este mês.</p>`;
-            }
+            document.getElementById('total-contas-mes').innerText = formatarMoeda(totalMesContas);
+            if(totalMesContas === 0) lista.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhuma conta/assinatura neste mês.</p>`;
         }
 
-        function renderizarEmprestimos() {
-            const lista = document.getElementById('lista-todos-emprestimos');
-            lista.innerHTML = '';
-            if(emprestimosData.length === 0){
-                lista.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhum empréstimo registrado.</p>`;
-                return;
+        // ==========================================
+        // 4. AÇÕES DE INSERÇÃO
+        // ==========================================
+        
+        // Categoria Save
+        document.getElementById('btn-save-categoria').addEventListener('click', async () => {
+            const nome = document.getElementById('new-categoria-name').value.trim();
+            if(!nome) return uiAlert("Digite o nome!");
+            const btn = document.getElementById('btn-save-categoria'); btn.innerText = "Salvando...";
+            await supabase.from('categorias').insert([{ nome, user_id: currentUser.id }]);
+            document.getElementById('new-categoria-name').value = '';
+            document.getElementById('categoria-modal').classList.add('hidden');
+            showToast("Categoria adicionada!"); await carregarDados();
+            btn.innerText = "Salvar";
+        });
+
+        // Adiantamento Save
+        document.getElementById('btn-save-adiantamento').addEventListener('click', async () => {
+            const valor = parseFloat(document.getElementById('valor-adiantamento').value);
+            const cartaoId = document.getElementById('filtro-cartao-resumo').value;
+            const mesAno = document.getElementById('resumo-mes').value;
+            if(!valor || cartaoId === 'todos') return uiAlert("Filtre a aba Resumo por um Cartão específico antes de adiantar, e informe o valor.");
+            
+            const btn = document.getElementById('btn-save-adiantamento'); btn.innerText = "Salvando...";
+            await supabase.from('adiantamentos').insert([{ cartao_id: cartaoId, mes_ano: mesAno, valor, user_id: currentUser.id }]);
+            document.getElementById('valor-adiantamento').value = '';
+            document.getElementById('adiantamento-modal').classList.add('hidden');
+            showToast("Valor adiantado!"); await carregarDados();
+            btn.innerText = "Salvar";
+        });
+
+        // Outros Inserters mantidos
+        document.getElementById('form-compra').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const pagadoresCheckboxes = document.querySelectorAll('.pagador-cb:checked');
+            if(pagadoresCheckboxes.length === 0) return uiAlert("Selecione quem paga!");
+            const cartaoId = document.getElementById('c-cartao').value;
+            if(!cartaoId) return uiAlert("Cadastre e selecione um cartão!");
+            
+            btn.innerText = "Salvando...";
+            const cartaoSelecionado = cartoesData.find(c => c.id === cartaoId);
+            const pagadoresList = Array.from(pagadoresCheckboxes).map(cb => cb.value);
+            
+            const dataCompra = new Date(document.getElementById('c-data').value + "T12:00:00");
+            let mesInicio = dataCompra.getMonth() + 1, anoInicio = dataCompra.getFullYear();
+            
+            // Regra do Mês Inclusivo
+            if (dataCompra.getDate() >= cartaoSelecionado.dia_fechamento) {
+                mesInicio++; if (mesInicio > 12) { mesInicio = 1; anoInicio++; }
             }
 
-            const ordenados = [...emprestimosData].sort((a,b) => new Date(b.data) - new Date(a.data));
-            ordenados.forEach(e => {
-                const isPendente = e.status === 'Pendente';
-                const statusColor = isPendente ? 'text-orange-500 bg-orange-100 dark:bg-orange-900/30' : 'text-emerald-500 bg-emerald-100 dark:bg-emerald-900/30';
-                const iconStatus = isPendente ? 'ph-clock' : 'ph-check-circle';
+            await supabase.from('compras').insert([{
+                user_id: currentUser.id, cartao_id: cartaoSelecionado.id, descricao: document.getElementById('c-descricao').value,
+                valor_total: parseFloat(document.getElementById('c-valor').value), data_compra: document.getElementById('c-data').value,
+                mes_inicio: mesInicio, ano_inicio: anoInicio, categoria: document.getElementById('c-categoria').value,
+                parcelas: parseInt(document.getElementById('c-parcelas').value), comprador: document.getElementById('c-comprador').value, pagadores: pagadoresList
+            }]);
+            
+            showToast("Compra salva!"); e.target.reset(); document.getElementById('c-data').value = hoje.toISOString().split('T')[0];
+            await carregarDados(); switchTab('resumo'); btn.innerText = "Salvar Compra";
+        });
 
-                lista.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer ${statusColor}" onclick="toggleEmprestimoStatus('${e.id}', '${e.status}')">
-                                <i class="ph ${iconStatus} text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-sm ${isPendente ? '' : 'line-through text-gray-400'}">${e.destinatario}</p>
-                                <p class="text-xs text-gray-500">${formatarData(e.data)}</p>
-                            </div>
-                        </div>
-                        <div class="text-right flex items-center gap-2">
-                            <p class="font-bold text-sm ${isPendente ? '' : 'text-gray-400'}">${formatarMoeda(e.valor)}</p>
-                            <button onclick="deletarItem('emprestimos', '${e.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="ph ph-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // Toggles visuais
-        window.toggleParcelasContas = () => {
+        document.getElementById('form-conta').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const tipo = document.getElementById('cf-tipo').value;
-            const div = document.getElementById('div-cf-parcelas');
-            if(tipo === 'Parcelada') div.classList.remove('hidden');
-            else div.classList.add('hidden');
-        }
+            const vinculo = document.getElementById('cf-cartao-vinculo').value;
+            
+            await supabase.from('contas').insert([{
+                user_id: currentUser.id, descricao: document.getElementById('cf-descricao').value, valor: parseFloat(document.getElementById('cf-valor').value),
+                dia_vencimento: parseInt(document.getElementById('cf-dia').value), tipo: tipo,
+                parcelas_totais: tipo === 'Parcelada' ? parseInt(document.getElementById('cf-parcelas').value) : 9999,
+                data_inicio: document.getElementById('resumo-mes').value + "-01", cartao_id: vinculo || null
+            }]);
+            showToast("Conta/Assinatura registrada!"); e.target.reset(); await carregarDados();
+        });
 
-        // MUDAR ABAS
+        // ==========================================
+        // HELPERS GERAIS
+        // ==========================================
+        window.openPersonModal = () => document.getElementById('person-modal').classList.remove('hidden');
+        window.openCartaoModal = () => document.getElementById('cartao-modal').classList.remove('hidden');
+        window.toggleParcelasContas = () => { document.getElementById('div-cf-parcelas').classList.toggle('hidden', document.getElementById('cf-tipo').value !== 'Parcelada'); };
+        window.deletarItem = (tabela, id) => { uiConfirm("Deseja mesmo apagar?", async () => { await supabase.from(tabela).delete().eq('id', id); showToast("Apagado!"); await carregarDados(); }); }
+        
+        window.uiAlert = (msg) => { document.getElementById('alert-msg').innerText = msg; document.getElementById('alert-modal').classList.remove('hidden'); }
+        window.uiConfirm = (msg, cb) => { document.getElementById('confirm-msg').innerText = msg; const m = document.getElementById('confirm-modal'); m.classList.remove('hidden'); document.getElementById('confirm-yes').onclick = () => { m.classList.add('hidden'); cb(); }; document.getElementById('confirm-no').onclick = () => m.classList.add('hidden'); }
+
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
-            
-            const btnColorMap = {
-                'resumo': 'text-brand-500',
-                'compra': 'text-brand-500',
-                'contas': 'text-blue-500',
-                'emprestimo': 'text-emerald-500'
-            };
-
+            const cores = {'resumo': 'text-brand-500', 'compra': 'text-brand-500', 'contas': 'text-blue-500', 'emprestimo': 'text-emerald-500'};
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.className = btn.className.replace(/text-(brand|blue|emerald)-500/g, 'text-gray-400');
-                if(btn.dataset.target === tabId) {
-                    btn.classList.remove('text-gray-400');
-                    btn.classList.add(btnColorMap[tabId]);
-                }
+                if(btn.dataset.target === tabId) { btn.classList.remove('text-gray-400'); btn.classList.add(cores[tabId]); }
             });
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        // HELPERS
+        
         const themeToggle = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
-        if (localStorage.getItem('theme') === 'light') htmlElement.classList.remove('dark');
-        themeToggle.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-            localStorage.setItem('theme', htmlElement.classList.contains('dark') ? 'dark' : 'light');
+        if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
+        themeToggle.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); if(dashboardChart) atualizarResumo(); });
+
+        function formatarMoeda(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function formatarData(d) { const [a, m, d2] = d.split('-'); return `${d2}/${m}/${a}`; }
+        function formatarDataHora(ts) { const d = new Date(ts); return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' }); }
+        function showToast(m) { const t = document.getElementById('toast'); document.getElementById('toast-text').innerText = m; t.classList.remove('translate-x-full'); setTimeout(() => t.classList.add('translate-x-full'), 3000); }
+        
+        // Emprestimos simplificados pra caber
+        document.getElementById('form-emprestimo').addEventListener('submit', async (e) => {
+            e.preventDefault(); await supabase.from('emprestimos').insert([{user_id: currentUser.id, destinatario: document.getElementById('e-nome').value, valor: parseFloat(document.getElementById('e-valor').value), data: document.getElementById('e-data').value, status: 'Pendente'}]);
+            showToast("Salvo!"); e.target.reset(); await carregarDados();
         });
-
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        window.toggleEmprestimoStatus = async (id, s) => { await supabase.from('emprestimos').update({ status: s === 'Pendente' ? 'Devolvido' : 'Pendente' }).eq('id', id); await carregarDados(); };
+        function renderizarEmprestimos() {
+            const l = document.getElementById('lista-todos-emprestimos'); l.innerHTML = '';
+            emprestimosData.sort((a,b) => new Date(b.data) - new Date(a.data)).forEach(e => {
+                const p = e.status === 'Pendente';
+                l.innerHTML += `<div class="bg-white dark:bg-gray-800 p-3 rounded-xl border flex justify-between group">
+                    <div class="flex items-center gap-3"><div onclick="toggleEmprestimoStatus('${e.id}', '${e.status}')" class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer ${p ? 'text-orange-500 bg-orange-100' : 'text-emerald-500 bg-emerald-100'}"><i class="ph ${p ? 'ph-clock' : 'ph-check-circle'} text-lg"></i></div>
+                    <div><p class="font-medium text-sm ${p ? '' : 'line-through text-gray-400'}">${e.destinatario}</p><p class="text-xs text-gray-500">${formatarData(e.data)}</p></div></div>
+                    <div class="flex items-center gap-2"><p class="font-bold text-sm ${p ? '' : 'text-gray-400'}">${formatarMoeda(e.valor)}</p><button onclick="deletarItem('emprestimos', '${e.id}')" class="text-red-500 p-2 opacity-0 group-hover:opacity-100"><i class="ph ph-trash"></i></button></div></div>`;
+            });
         }
-        function formatarData(dataString) {
-            const [ano, mes, dia] = dataString.split('-');
-            return `${dia}/${mes}/${ano}`;
-        }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-text').innerText = message;
-            toast.classList.remove('translate-x-full');
-            setTimeout(() => toast.classList.add('translate-x-full'), 3000);
-        }
-
     </script>
 </body>
 </html>
