@@ -192,7 +192,7 @@
             <!-- ABA 1: RESUMO DO MÊS -->
             <section id="tab-resumo" class="tab-content active">
                 
-                <!-- Área da Renda -->
+                <!-- Área da Renda e Saldo -->
                 <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-4 rounded-2xl shadow-sm mb-6 relative overflow-hidden">
                     <div class="relative z-10">
                         <div class="flex justify-between items-center mb-1">
@@ -200,7 +200,15 @@
                             <button onclick="configurarRenda()" class="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded transition-colors">Editar</button>
                         </div>
                         <p class="text-2xl font-bold" id="txt-renda">R$ 0,00</p>
-                        <p class="text-[11px] opacity-80 mt-1" id="txt-quinto-dia"><i class="ph ph-calendar"></i> Carregando datas...</p>
+                        
+                        <!-- Novo Box de Saldo Mensal -->
+                        <div class="mt-4 pt-3 border-t border-white/20 flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] opacity-90 uppercase tracking-wider font-semibold mb-1">Saldo Sobrando</p>
+                                <p class="text-lg font-bold" id="txt-saldo-sobrando">R$ 0,00</p>
+                            </div>
+                            <p class="text-[11px] opacity-80" id="txt-quinto-dia"><i class="ph ph-calendar"></i> Carregando...</p>
+                        </div>
                     </div>
                 </div>
 
@@ -209,9 +217,19 @@
                     <input type="month" id="resumo-mes" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
-                <select id="filtro-cartao-resumo" class="w-full px-4 py-2 mb-6 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
-                    <option value="todos">Todos os Cartões</option>
-                </select>
+                <!-- Novos Filtros da Aba Resumo -->
+                <div class="flex flex-col md:flex-row gap-3 mb-6">
+                    <select id="filtro-cartao-resumo" class="flex-1 px-3 py-2 text-sm rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="todos">Todos os Cartões</option>
+                    </select>
+                    <select id="filtro-categoria-resumo" class="flex-1 px-3 py-2 text-sm rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="todas">Todas as Categorias</option>
+                    </select>
+                    <select id="ordem-resumo" class="flex-1 px-3 py-2 text-sm rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="compra">Ordem: Data da Compra</option>
+                        <option value="registro">Ordem: Data de Registro</option>
+                    </select>
+                </div>
 
                 <!-- Gráfico Dashboard (Altura ajustada) -->
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
@@ -340,14 +358,25 @@
                         <label class="block text-sm text-gray-500 mb-1">Descrição (Ex: Seguro Moto, Netflix)</label>
                         <input type="text" id="cf-descricao" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm text-gray-500 mb-1">Tipo de Conta</label>
-                        <select id="cf-tipo" onchange="toggleCamposConta()" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="Mensal">Conta Mensal (Boleto/Pix)</option>
-                            <option value="Assinatura">Assinatura (Cartão de Crédito)</option>
-                            <option value="Parcelada">Dívida Parcelada (Carnê/Boleto)</option>
-                        </select>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm text-gray-500">Categoria</label>
+                                <button type="button" onclick="document.getElementById('categoria-modal').classList.remove('hidden')" class="text-xs text-blue-500 font-bold hover:underline">Configurar</button>
+                            </div>
+                            <select id="cf-categoria" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Preenchido via JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-500 mb-1">Tipo de Conta</label>
+                            <select id="cf-tipo" onchange="toggleCamposConta()" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Mensal">Conta Mensal (Boleto/Pix)</option>
+                                <option value="Assinatura">Assinatura (Cartão de Crédito)</option>
+                                <option value="Parcelada">Dívida Parcelada (Carnê/Boleto)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -378,10 +407,18 @@
 
                 <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 p-4 rounded-2xl mb-4 flex justify-between items-center">
                     <div>
-                        <p class="text-sm font-semibold text-blue-700 dark:text-blue-400">Total de Contas (<span id="lbl-mes-contas"></span>)</p>
-                        <p class="text-[10px] text-blue-600/70 dark:text-blue-400/70">Soma de boletos e parcelas do mês</p>
+                        <p class="text-sm font-semibold text-blue-700 dark:text-blue-400">Falta Pagar (<span id="lbl-mes-contas"></span>)</p>
+                        <p class="text-[10px] text-blue-600/70 dark:text-blue-400/70">Soma de contas pendentes do mês</p>
                     </div>
                     <p class="text-xl font-bold text-blue-700 dark:text-blue-400" id="total-contas-mes">R$ 0,00</p>
+                </div>
+
+                <!-- Cabeçalho da Lista de Contas com Filtro -->
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-sm md:text-base flex items-center gap-2"><i class="ph ph-calendar-check"></i> Lista de Contas</h3>
+                    <select id="filtro-categoria-contas" class="px-3 py-1 text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="todas">Todas Categorias</option>
+                    </select>
                 </div>
 
                 <div id="lista-contas-mes" class="space-y-3 mb-8"></div>
@@ -514,6 +551,7 @@
             renderizarContas();
             renderizarEmprestimos();
             calcularRenda();
+            calcularSaldoSobrando();
         }
 
         // ==========================================
@@ -547,6 +585,55 @@
             }
         };
 
+        function calcularSaldoSobrando() {
+            const inputMes = document.getElementById('resumo-mes').value;
+            const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
+            
+            // 1. Renda
+            const ultimaRenda = rendasData.sort((a,b) => new Date(b.criado_em) - new Date(a.criado_em))[0];
+            const valorRenda = ultimaRenda ? ultimaRenda.valor : 0;
+            
+            let totalDespesasGeral = 0;
+
+            // 2. Soma todas as faturas de todos os cartões que caem neste mês
+            comprasData.forEach(compra => {
+                const mesesDiferenca = (anoSelecionado - compra.ano_inicio) * 12 + (mesSelecionado - compra.mes_inicio);
+                if (mesesDiferenca >= 0 && mesesDiferenca < compra.parcelas) {
+                    totalDespesasGeral += (compra.valor_total / compra.parcelas);
+                }
+            });
+
+            // 3. Soma todas as contas fixas e assinaturas que caem neste mês
+            contasData.forEach(conta => {
+                const dataInicio = new Date(conta.data_inicio + "T12:00:00");
+                const mesesDiferenca = (anoSelecionado - dataInicio.getFullYear()) * 12 + (mesSelecionado - (dataInicio.getMonth() + 1));
+                if (mesesDiferenca >= 0 && mesesDiferenca < conta.parcelas_totais) {
+                    totalDespesasGeral += conta.valor;
+                }
+            });
+
+            // 4. Subtrai os adiantamentos já pagos nas faturas
+            adiantamentosData.forEach(a => {
+                if (a.mes_ano === inputMes) {
+                    totalDespesasGeral -= a.valor;
+                }
+            });
+
+            // Atualiza na Tela
+            const saldo = valorRenda - totalDespesasGeral;
+            const elSaldo = document.getElementById('txt-saldo-sobrando');
+            elSaldo.innerText = formatarMoeda(saldo);
+            
+            // Fica Vermelho se o saldo estiver negativo
+            if(saldo < 0) {
+                elSaldo.classList.add('text-red-200', 'bg-red-900/50', 'px-2', 'py-1', 'rounded-lg');
+                elSaldo.classList.remove('text-white');
+            } else {
+                elSaldo.classList.remove('text-red-200', 'bg-red-900/50', 'px-2', 'py-1', 'rounded-lg');
+                elSaldo.classList.add('text-white');
+            }
+        }
+
         function renderizarSelects() {
             // Cartoes
             const selectCartao = document.getElementById('c-cartao');
@@ -570,12 +657,24 @@
                     </div>`;
             });
 
-            // Categorias
+            // Categorias (Nas Compras e nas Contas Fixas e na Aba Resumo)
             const selectCategoria = document.getElementById('c-categoria');
+            const selectCategoriaConta = document.getElementById('cf-categoria');
+            const filtroCategoriaConta = document.getElementById('filtro-categoria-contas');
+            const filtroCategoriaResumo = document.getElementById('filtro-categoria-resumo');
             const listaCategorias = document.getElementById('lista-categorias-modal');
-            selectCategoria.innerHTML = ''; listaCategorias.innerHTML = '';
+            
+            selectCategoria.innerHTML = ''; 
+            selectCategoriaConta.innerHTML = '';
+            filtroCategoriaConta.innerHTML = '<option value="todas">Todas as Categorias</option>';
+            filtroCategoriaResumo.innerHTML = '<option value="todas">Todas as Categorias</option>';
+            listaCategorias.innerHTML = '';
+            
             categoriasData.forEach(c => {
                 selectCategoria.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                selectCategoriaConta.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                filtroCategoriaConta.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
+                filtroCategoriaResumo.innerHTML += `<option value="${c.nome}">${c.nome}</option>`;
                 listaCategorias.innerHTML += `<div class="flex justify-between items-center py-1"><span class="text-sm">${c.nome}</span><button onclick="deletarItem('categorias', '${c.id}')" class="text-red-500"><i class="ph ph-trash"></i></button></div>`;
             });
 
@@ -595,15 +694,29 @@
         }
 
         // ==========================================
-        // 3. ATUALIZAÇÃO DA FATURA (A MÁGICA)
+        // 3. ATUALIZAÇÃO DA FATURA E CONTAS
         // ==========================================
-        document.getElementById('resumo-mes').addEventListener('change', () => { atualizarResumo(); renderizarContas(); calcularRenda(); });
+        document.getElementById('resumo-mes').addEventListener('change', () => { 
+            atualizarResumo(); 
+            renderizarContas(); 
+            calcularRenda(); 
+            calcularSaldoSobrando();
+        });
+        
+        // Listeners para os novos filtros da Aba Resumo
         document.getElementById('filtro-cartao-resumo').addEventListener('change', atualizarResumo);
+        document.getElementById('filtro-categoria-resumo').addEventListener('change', atualizarResumo);
+        document.getElementById('ordem-resumo').addEventListener('change', atualizarResumo);
+        
+        document.getElementById('filtro-categoria-contas').addEventListener('change', renderizarContas);
 
         function atualizarResumo() {
             if(pessoasData.length === 0) return;
             const inputMes = document.getElementById('resumo-mes').value;
             const cartaoFiltro = document.getElementById('filtro-cartao-resumo').value;
+            const catFiltroResumo = document.getElementById('filtro-categoria-resumo').value;
+            const ordemResumo = document.getElementById('ordem-resumo').value;
+            
             if(!inputMes) return;
             
             const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
@@ -617,6 +730,7 @@
             // 1. Processar Compras do Cartão
             comprasData.forEach(compra => {
                 if(cartaoFiltro !== 'todos' && compra.cartao_id !== cartaoFiltro) return;
+                if(catFiltroResumo !== 'todas' && compra.categoria !== catFiltroResumo) return;
                 
                 const mesesDiferenca = (anoSelecionado - compra.ano_inicio) * 12 + (mesSelecionado - compra.mes_inicio);
                 if (mesesDiferenca >= 0 && mesesDiferenca < compra.parcelas) {
@@ -633,8 +747,13 @@
 
                     const cartaoNome = cartoesData.find(c => c.id === compra.cartao_id)?.nome || 'Cartão Apagado';
                     faturaItems.push({
-                        ...compra, valorExibir: valorParcela, subtitulo: `${cartaoNome} • Parc. ${mesesDiferenca + 1}/${compra.parcelas}`,
-                        icone: 'ph-credit-card', timestampFormatado: `${formatarData(compra.data_compra)} (Reg: ${formatarDataHora(compra.criado_em)})`
+                        ...compra, 
+                        valorExibir: valorParcela, 
+                        subtitulo: `${cartaoNome} • Parc. ${mesesDiferenca + 1}/${compra.parcelas} • ${compra.categoria}`,
+                        icone: 'ph-credit-card', 
+                        timestampFormatado: `Comprado em: ${formatarData(compra.data_compra)} (Reg: ${formatarDataHora(compra.criado_em)})`,
+                        sortDataCompra: new Date(compra.data_compra + "T12:00:00"),
+                        sortDataRegistro: new Date(compra.criado_em)
                     });
                 }
             });
@@ -643,6 +762,9 @@
             contasData.forEach(conta => {
                 if(!conta.cartao_id) return; // Se não tem cartão, ignora (Boleto/Pix não vai pra fatura)
                 if(cartaoFiltro !== 'todos' && conta.cartao_id !== cartaoFiltro) return;
+                
+                const catConta = conta.categoria || 'Outros';
+                if(catFiltroResumo !== 'todas' && catConta !== catFiltroResumo) return;
 
                 const dataInicio = new Date(conta.data_inicio + "T12:00:00");
                 const mesesDiferenca = (anoSelecionado - dataInicio.getFullYear()) * 12 + (mesSelecionado - (dataInicio.getMonth() + 1));
@@ -650,22 +772,39 @@
                 if (mesesDiferenca >= 0 && mesesDiferenca < conta.parcelas_totais) {
                     totalFatura += conta.valor;
                     totaisPorPessoa['Eu'] += conta.valor; // Assume que quem paga a assinatura do cartão é o dono
-                    dadosGrafico['Assinaturas'] = (dadosGrafico['Assinaturas'] || 0) + conta.valor;
+                    dadosGrafico[catConta] = (dadosGrafico[catConta] || 0) + conta.valor;
 
                     const cartaoNome = cartoesData.find(c => c.id === conta.cartao_id)?.nome || 'Cartão Apagado';
                     faturaItems.push({
-                        id: conta.id, descricao: conta.descricao, valorExibir: conta.valor, subtitulo: `Assinatura via ${cartaoNome}`,
-                        icone: 'ph-repeat', timestampFormatado: `Iniciado em ${formatarData(conta.data_inicio)}`
+                        id: conta.id, 
+                        descricao: conta.descricao, 
+                        valorExibir: conta.valor, 
+                        subtitulo: `Assinatura via ${cartaoNome} • ${catConta}`,
+                        icone: 'ph-repeat', 
+                        timestampFormatado: `Iniciado em: ${formatarData(conta.data_inicio)} (Reg: ${formatarDataHora(conta.criado_em)})`,
+                        sortDataCompra: new Date(conta.data_inicio + "T12:00:00"),
+                        sortDataRegistro: new Date(conta.criado_em)
                     });
                 }
             });
 
-            // 3. Subtrair Adiantamentos
-            adiantamentosData.forEach(a => {
-                if (a.mes_ano === inputMes && (cartaoFiltro === 'todos' || a.cartao_id === cartaoFiltro)) {
-                    totalFatura -= a.valor;
-                    totalAdiantado += a.valor;
-                    totaisPorPessoa['Eu'] -= a.valor; // O abate entra pro dono
+            // 3. Subtrair Adiantamentos (Apenas se não houver filtro de categoria ativo)
+            if (catFiltroResumo === 'todas') {
+                adiantamentosData.forEach(a => {
+                    if (a.mes_ano === inputMes && (cartaoFiltro === 'todos' || a.cartao_id === cartaoFiltro)) {
+                        totalFatura -= a.valor;
+                        totalAdiantado += a.valor;
+                        totaisPorPessoa['Eu'] -= a.valor; // O abate entra pro dono
+                    }
+                });
+            }
+
+            // 4. Ordenar os itens conforme escolha do usuário
+            faturaItems.sort((a, b) => {
+                if (ordemResumo === 'compra') {
+                    return b.sortDataCompra - a.sortDataCompra; // Recentes primeiro
+                } else {
+                    return b.sortDataRegistro - a.sortDataRegistro; // Recentes primeiro
                 }
             });
 
@@ -729,7 +868,7 @@
                         maintainAspectRatio: false, 
                         plugins: { 
                             legend: { 
-                                position: 'bottom', // Moveu para baixo para não cortar o texto
+                                position: 'bottom',
                                 labels: { 
                                     color: localStorage.getItem('theme') === 'dark' ? '#fff' : '#333',
                                     padding: 20
@@ -762,24 +901,29 @@
 
         function renderizarContas() {
             const inputMes = document.getElementById('resumo-mes').value;
+            const catFiltro = document.getElementById('filtro-categoria-contas').value;
             const [anoSelecionado, mesSelecionado] = inputMes.split('-').map(Number);
             const lista = document.getElementById('lista-contas-mes');
             lista.innerHTML = '';
             
-            // Conserta o texto do mês lá no topo que estava vazio "()"
             const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
             document.getElementById('lbl-mes-contas').innerText = `${meses[mesSelecionado-1]}/${anoSelecionado}`;
 
-            let totalMesContas = 0; // Total agora só vai somar o que FALTA pagar
+            let totalMesContas = 0; 
+            
+            // ORDENAÇÃO: Mais recentes no topo (com base na data que foi cadastrada)
+            const contasOrdenadas = [...contasData].sort((a,b) => new Date(b.criado_em) - new Date(a.criado_em));
 
-            contasData.forEach(conta => {
+            contasOrdenadas.forEach(conta => {
+                // FILTRO DE CATEGORIA
+                if (catFiltro !== 'todas' && conta.categoria !== catFiltro) return;
+
                 const dataInicio = new Date(conta.data_inicio + "T12:00:00");
                 const mesesDiferenca = (anoSelecionado - dataInicio.getFullYear()) * 12 + (mesSelecionado - (dataInicio.getMonth() + 1));
                 
                 if (mesesDiferenca >= 0 && mesesDiferenca < conta.parcelas_totais) {
                     const isPago = pagamentosData.some(p => p.conta_id === conta.id && p.mes_ano === inputMes && p.status === true);
                     
-                    // REGRA NOVA: Só adiciona ao valor total se a conta NÃO estiver paga
                     if (!isPago) {
                         totalMesContas += conta.valor;
                     }
@@ -792,6 +936,7 @@
                         const nomeC = cartoesData.find(c => c.id === conta.cartao_id)?.nome;
                         subtitulo += ` • No cartão ${nomeC}`;
                     }
+                    subtitulo += ` • ${conta.categoria || 'Sem categoria'}`;
 
                     lista.innerHTML += `
                         <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
@@ -813,7 +958,7 @@
             });
             document.getElementById('total-contas-mes').innerText = formatarMoeda(totalMesContas);
             if (lista.innerHTML === '') {
-                lista.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhuma conta/assinatura neste mês.</p>`;
+                lista.innerHTML = `<p class="text-gray-500 text-sm text-center py-4">Nenhuma conta encontrada neste filtro/mês.</p>`;
             }
         }
 
@@ -848,7 +993,7 @@
             btn.innerText = "Salvar";
         });
 
-        // Outros Inserters mantidos
+        // Compras e Contas
         document.getElementById('form-compra').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
@@ -884,6 +1029,7 @@
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             const tipo = document.getElementById('cf-tipo').value;
+            const categoriaEscolhida = document.getElementById('cf-categoria').value;
             
             let diaVencimento = 0;
             let cartaoId = null;
@@ -907,12 +1053,13 @@
                 tipo: tipo,
                 parcelas_totais: tipo === 'Parcelada' ? parseInt(document.getElementById('cf-parcelas').value) : 9999,
                 data_inicio: document.getElementById('resumo-mes').value + "-01", 
-                cartao_id: cartaoId
+                cartao_id: cartaoId,
+                categoria: categoriaEscolhida
             }]);
             
             showToast("Conta/Assinatura registrada!"); 
             e.target.reset(); 
-            window.toggleCamposConta(); // Reseta os campos que escondemos
+            window.toggleCamposConta(); // Reseta os campos que ocultamos
             await carregarDados();
             btn.innerText = "Cadastrar Conta";
         });
