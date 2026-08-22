@@ -966,6 +966,41 @@
         // 4. AÇÕES DE INSERÇÃO
         // ==========================================
         
+        // Salvar Nova Pessoa
+        document.getElementById('btn-save-person').addEventListener('click', async () => {
+            const nome = document.getElementById('new-person-name').value.trim();
+            if(!nome) return uiAlert("Digite um nome!");
+            const btn = document.getElementById('btn-save-person'); btn.innerText = "Salvando...";
+            await supabase.from('pessoas').insert([{ nome, user_id: currentUser.id }]);
+            document.getElementById('new-person-name').value = '';
+            document.getElementById('person-modal').classList.add('hidden');
+            showToast("Pessoa adicionada!"); await carregarDados();
+            btn.innerText = "Salvar";
+        });
+
+        // Salvar Novo Cartão
+        document.getElementById('btn-save-cartao').addEventListener('click', async () => {
+            const nome = document.getElementById('new-cartao-nome').value.trim();
+            const diaFechamento = parseInt(document.getElementById('new-cartao-fechamento').value);
+            const diaVencimento = parseInt(document.getElementById('new-cartao-vencimento').value);
+
+            if(!nome || !diaFechamento || !diaVencimento) return uiAlert("Preencha todos os campos do cartão!");
+            if(diaFechamento < 1 || diaFechamento > 31 || diaVencimento < 1 || diaVencimento > 31) return uiAlert("Dias devem ser entre 1 e 31.");
+            
+            const btn = document.getElementById('btn-save-cartao'); btn.innerText = "Salvando...";
+
+            await supabase.from('cartoes').insert([{ 
+                nome, dia_fechamento: diaFechamento, dia_vencimento: diaVencimento, user_id: currentUser.id 
+            }]);
+            
+            document.getElementById('new-cartao-nome').value = '';
+            document.getElementById('new-cartao-fechamento').value = '';
+            document.getElementById('new-cartao-vencimento').value = '';
+            document.getElementById('cartao-modal').classList.add('hidden');
+            showToast("Cartão adicionado!"); await carregarDados();
+            btn.innerText = "Salvar";
+        });
+
         // Categoria Save
         document.getElementById('btn-save-categoria').addEventListener('click', async () => {
             const nome = document.getElementById('new-categoria-name').value.trim();
